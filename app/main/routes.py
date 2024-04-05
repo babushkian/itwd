@@ -1,9 +1,12 @@
 ﻿from flask import render_template, flash, redirect, url_for, request, g, jsonify, current_app
+from sqlalchemy import select, func, or_
+from flask_cors import cross_origin
+
 from app.main import bp
 from app.models import session
-from sqlalchemy import select, func
 from app.models.people import People, PeopleStatus, StatusName
-from flask_cors import cross_origin
+from app.models.firms import Firm, FirmName, FirmRating
+
 @bp.route('/', methods=['GET'])
 def index():
 	q = select(People).limit(20)
@@ -17,7 +20,7 @@ def index():
 @bp.route('/people_status', methods=['GET'])
 @cross_origin()
 def people_status():
-	return render_template('people.html', test = 'Что-то')
+	return render_template('people.html', script='people')
 
 
 @bp.route('/pstatus/<did>', methods=['GET'])
@@ -33,13 +36,45 @@ def people_status_json(did):
 		 .join(PeopleStatus, People.id == PeopleStatus.people_id)
 		 .join(StatusName, PeopleStatus.status_id == StatusName.id)
 		 .where(PeopleStatus.id.in_(select(max_ids)))
+		 .order_by(People.id)
 		 )
 	res = session.execute(q)
 	records = []
 	for row in res:
 		records.append(row._asdict())
 	x = jsonify(records)
-	print(x.json)
+	# print(x.json)
 	return x
 
+
+@bp.route('/firms_status', methods=['GET'])
+@cross_origin()
+def firms_status():
+	return render_template('people.html', script='firms')
+
+@bp.route('/fstatus/<did>', methods=['GET'])
+@cross_origin()
+def firm_status_json(did):
+	maxrec = (select(func.max(FirmRating.id))
+		 .where(FirmRating.rate_date <= did)
+		 .group_by(FirmRating.firm_id)
+		 .cte()
+	)
+	actual_rating = select(FirmRating).where(FirmRating.id.in_(select(maxrec))).cte()
+
+	q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
+				actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date)
+		 .select_from(Firm)
+		 .join(FirmName, Firm.firmname_id == FirmName.id)
+	     .join(actual_rating, actual_rating.c.firm_id == Firm.id, isouter=True)
+		 .where(or_(Firm.close_date.is_(None), Firm.close_date> did))
+		 .where(Firm.open_date <= did)
+	)
+	res = session.execute(q)
+	records = []
+	for row in res:
+		records.append(row._asdict())
+	x = jsonify(records)
+	# print(x.json)
+	return x
 

@@ -1,8 +1,14 @@
 ﻿{% extends "base.html" %}
 {% block content %}
-<h1>Люди-людишечки</h1>
 {% endblock content %}
 
 {% block js %}
-<script src="{{ url_for('static', filename = 'js/people.js') }}"></script>
+    {% if script == 'people' %}
+        <script src="{{ url_for('static', filename = 'js/people.js') }}"></script>
+    {% endif%}
+
+    {% if script == 'firms' %}
+        <script src="{{ url_for('static', filename = 'js/firms.js') }}"></script>
+    {% endif%}
+    {{ super() }}
 {% endblock js %}
