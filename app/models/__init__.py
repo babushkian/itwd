@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
-
+from app.cred import Cred
 class Base(DeclarativeBase):
     pass
 
