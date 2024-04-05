@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Артель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href= "{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href= "{{ url_for('static', filename='css/table.css') }}" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="header_row">
+        <div class="menu_option option_people">
+          <a href="#"> Люди </a>
+        </div>
+        <div class="menu_option option_firms">
+          <a href="#">Фирмы</a>
+        </div>
+      </div>
+      <div class="header_row timer">
+        <button id="month-minus"><<</button>
+        <button id="day-minus"><</button>
+        <input
+          type="date"
+          id="main-date"
+          value="2007-01-01"
+          required
+          min="2005-01-01"
+          max="2014-01-01"
+        />
+
+        <button id="day-plus">></button>
+        <button id="month-plus">>></button>
+      </div>
+    </div>
+    <div class="content">
+      {% block content %}
+      {% endblock content %}
+    </div>
+    
+    {% block js %}
+    {% endblock js %}
+  </body>
+</html>
