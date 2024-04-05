@@ -1,5 +1,5 @@
 const content = document.querySelector(".content");
-const active = document.querySelector(".option_people");
+const active = document.querySelector("." + currentPage);
 active.classList.add("option_active");
 
 const mainDate = document.querySelector("#main-date");

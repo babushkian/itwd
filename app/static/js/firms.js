@@ -1,4 +1,5 @@
-﻿async function getStat(date) {
+﻿const currentPage = "option_firms";
+async function getStat(date) {
   const URL = `http://127.0.0.1:5000/fstatus/${date}`;
   const data = await fetch(URL);
   const cd = await data.json();

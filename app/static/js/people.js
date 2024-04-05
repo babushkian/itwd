@@ -1,3 +1,4 @@
+const currentPage = "option_people";
 async function getStat(date) {
   const URL = `http://127.0.0.1:5000/pstatus/${date}`;
   const data = await fetch(URL);
