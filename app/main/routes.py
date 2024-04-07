@@ -31,7 +31,9 @@ def people_status_json(did):
 		 .group_by(PeopleStatus.people_id)
 		 .cte()
 		 )
-	q = (select(People.id, People.last_name, People.first_name, StatusName.name, PeopleStatus.status_date)
+	q = (select(People.id,
+				func.concat(People.last_name, ' ', People.first_name, ' ', People.second_name).label('fio'),
+				StatusName.name.label('status'), PeopleStatus.status_date)
 		 .select_from(People)
 		 .join(PeopleStatus, People.id == PeopleStatus.people_id)
 		 .join(StatusName, PeopleStatus.status_id == StatusName.id)
@@ -42,8 +44,13 @@ def people_status_json(did):
 	records = []
 	for row in res:
 		records.append(row._asdict())
-	x = jsonify(records)
-	# print(x.json)
+	a = did.split('-')
+	a.reverse()
+	title = f"Информация о людях на {'.'.join(map(str, a))}"
+	order = ["id", "fio", "status", "status_date"]
+	header = {"id": 'ID', "fio": 'имя', "status": 'статус', "status_date": 'дата получения статуса'}
+	x = jsonify({'title': title, 'order':order,'header':header, 'data': records})
+
 	return x
 
 

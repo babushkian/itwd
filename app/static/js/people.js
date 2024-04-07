@@ -1,22 +1,43 @@
 const currentPage = "option_people";
+
 async function getStat(date) {
   const URL = `http://127.0.0.1:5000/pstatus/${date}`;
   const data = await fetch(URL);
   const cd = await data.json();
-  buildTable(cd);
+  console.log(mainDate.value);
+  // buildTable(cd);
+  buildTableNew(cd);
 }
 
-function buildTable(data) {
+function convertInputToString(d) {
+  dp = d.split("-");
+  return dp.reverse().join(".");
+}
+
+function buildTableNew({ title, order, header, data }) {
   while (content.firstChild) {
     content.removeChild(content.firstChild);
   }
+  const tt = document.createElement("div");
+
+  tt.innerText = title;
+  tt.className = "table_title";
+  content.appendChild(tt);
   const tb = document.createElement("table");
   content.appendChild(tb);
+  const th = document.createElement("tr");
+  tb.appendChild(th);
+
+  order.forEach((el) => {
+    const thd = document.createElement("th");
+    thd.innerText = header[el];
+    th.appendChild(thd);
+  });
+
   data.forEach((element) => {
     const tr = document.createElement("tr");
     tb.appendChild(tr);
-    keys = ["id", "last_name", "first_name", "name", "status_date"];
-    keys.forEach((key) => {
+    order.forEach((key) => {
       let a = document.createElement("td");
       if (key != "status_date") {
         a.innerText = element[key];

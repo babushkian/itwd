@@ -1,4 +1,4 @@
-const content = document.querySelector(".content");
+const content = document.querySelector(".content__window.main");
 const active = document.querySelector("." + currentPage);
 active.classList.add("option_active");
 

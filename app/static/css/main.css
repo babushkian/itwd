@@ -1,0 +1,176 @@
+@font-face {
+  font-family: "FiraSans";
+  font-style: normal;
+  font-weight: 100;
+  src: url("../fonts/FiraSans-Thin.ttf") format("truetype");
+}
+@font-face {
+  font-family: "FiraSans";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../fonts/FiraSans-Light.ttf") format("truetype");
+}
+@font-face {
+  font-family: "FiraSans";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/FiraSans-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "FiraSans";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../fonts/FiraSans-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "FiraSans";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/FiraSans-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "FiraSans";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../fonts/FiraSans-Black.ttf") format("truetype");
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "FiraSans", Arial, Helvetica, sans-serif;
+  font-weight: 500;
+  background-color: rgb(36, 36, 55);
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(34, 34, 51);
+  color: #e0e0f8;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  min-width: 100vw;
+  font-weight: 500;
+  font-size: 1.25rem;
+  box-shadow: 0 0 5px #000;
+}
+
+.header_row {
+  min-width: 360px;
+  margin: 0.5rem auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  list-style-type: none;
+}
+.header_row a {
+  text-decoration: none;
+  color: inherit;
+}
+.header_row .option_active a {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff9dc;
+  text-decoration: underline;
+}
+.header_row.timer {
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.timer {
+  margin: 0.5rem auto;
+}
+.timer button {
+  font-family: "FiraSans", Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  background-color: #e0e0f8;
+  border-radius: 2px;
+  margin: 0 0.2rem;
+  min-width: 2rem;
+  border: 0;
+}
+.timer input {
+  font-family: "FiraSans", Arial, Helvetica, sans-serif;
+  width: 140px;
+  font-size: 1.25rem;
+  background-color: #e0e0f8;
+  border-radius: 2px;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.2rem;
+  font-weight: 400;
+  height: 100vh;
+  padding-top: 80px;
+  margin: auto;
+  overflow-y: none;
+}
+
+.content__window {
+  background-color: hsl(187, 24%, 86%);
+  height: 100%;
+  width: -moz-max-content;
+  width: max-content;
+  margin: 0;
+  border-right: 1px solid #222;
+  overflow: auto;
+}
+.content__window.main {
+  box-shadow: 0 0 10px #000;
+}
+.content__window.side {
+  margin: 0;
+  background-color: hsl(187, 24%, 82%);
+}
+.content__window .table_title {
+  margin: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+table {
+  /* border: 1px solid black; */
+  border-collapse: collapse;
+  min-width: 300px;
+  margin: 1rem;
+  border: 1px solid rgba(83, 73, 73, 0.4);
+}
+table th {
+  background-color: hsl(187, 10%, 27%);
+  color: rgb(238, 247, 244);
+  font-weight: 500;
+  padding: 8px;
+}
+table tr {
+  border-bottom: 1px solid rgba(83, 73, 73, 0.4);
+  background-color: rgb(220, 228, 223);
+}
+table tr:nth-child(even) {
+  background-color: rgb(228, 234, 229);
+}
+table tr:hover {
+  background-color: rgb(227, 241, 232);
+}
+table tr span:hover {
+  text-decoration: underline;
+}
+table td {
+  padding: 8px 15px;
+  text-align: center;
+  min-width: 100px;
+}/*# sourceMappingURL=main.css.map */

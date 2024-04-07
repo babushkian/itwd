@@ -27,13 +27,17 @@ function buildTable(data) {
     keys.forEach((key) => {
       let a = document.createElement("td");
       if (["open_date", "close_date", "rate_date"].includes(key)) {
-        const d = new Date(element[key]);
-        a.innerText =
-          d.getDate().toString().padStart(2, "0") +
-          "." +
-          (d.getMonth() + 1).toString().padStart(2, "0") +
-          "." +
-          d.getFullYear();
+        if (element[key]) {
+          const d = new Date(element[key]);
+          a.innerText =
+            d.getDate().toString().padStart(2, "0") +
+            "." +
+            (d.getMonth() + 1).toString().padStart(2, "0") +
+            "." +
+            d.getFullYear();
+        } else {
+          a.innerText = "";
+        }
       } else {
         a.innerText = element[key];
       }

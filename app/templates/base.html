@@ -4,14 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Артель</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;600;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href= "{{ url_for('static', filename='css/style.css') }}" />
-    <link rel="stylesheet" href= "{{ url_for('static', filename='css/table.css') }}" />
+    <link rel="stylesheet" href= "{{ url_for('static', filename='css/main.css') }}" />
+
   </head>
   <body>
     <div class="header">
@@ -40,8 +34,40 @@
       </div>
     </div>
     <div class="content">
+      <div class="content__window main">
       {% block content %}
       {% endblock content %}
+      </div>
+            <div class="content__window side">
+        <div class="table_title">Информация о человеке:</div>
+        <table>
+          <tr>
+            <th>Фмаилия</th>
+            <td>Иванов</td>
+          </tr>
+
+          <tr>
+            <th>Имя</th>
+            <td>Иван</td>
+          </tr>
+          <tr>
+            <th>Отчество</th>
+            <td>Иванович</td>
+          </tr>
+          <tr>
+            <th>Дата рождения</th>
+            <td>23.06.1992</td>
+          </tr>
+          <tr>
+            <th>Фирма</th>
+            <td>Анальник</td>
+          </tr>
+          <tr>
+            <th>Должность</th>
+            <td>Инженер по технике безопасности кротовых нор</td>
+          </tr>
+        </table>
+      </div>
     </div>
     
     {% block js %}
