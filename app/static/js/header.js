@@ -82,10 +82,12 @@ function buildMainTable({ title, order, header, data }) {
     thd.innerText = header[el];
     th.appendChild(thd);
   });
-
   data.forEach((element) => {
     const tr = document.createElement("tr");
     tb.appendChild(tr);
+    if (!element.active) {
+      tr.classList.add("not_active");
+    }
     order.forEach((key) => {
       let a = document.createElement("td");
       if (!key.includes("_date")) {

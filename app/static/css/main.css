@@ -166,6 +166,9 @@ table tr:nth-child(even) {
 table tr:hover {
   background-color: rgb(227, 241, 232);
 }
+table tr.not_active {
+  color: #888;
+}
 table tr span:hover {
   text-decoration: underline;
 }
@@ -173,4 +176,4 @@ table td {
   padding: 8px 15px;
   text-align: center;
   min-width: 100px;
-}/*# sourceMappingURL=main.css.map */
+} /*# sourceMappingURL=main.css.map */

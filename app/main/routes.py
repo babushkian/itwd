@@ -1,5 +1,7 @@
 ﻿from flask import render_template, flash, redirect, url_for, request, g, jsonify, current_app
 from sqlalchemy import select, func, or_
+from sqlalchemy.sql.expression import True_, label
+
 from flask_cors import cross_origin
 
 from app.main import bp
@@ -7,94 +9,109 @@ from app.models import session
 from app.models.people import People, PeopleStatus, StatusName
 from app.models.firms import Firm, FirmName, FirmRating
 
+
 @bp.route('/', methods=['GET'])
 def index():
-	q = select(People).limit(20)
-	res = session.execute(q).scalars().all()
-	for i in res:
-		print(i)
-	return render_template('index.html', users=res)
-
+    q = select(People).limit(20)
+    res = session.execute(q).scalars().all()
+    for i in res:
+        print(i)
+    return render_template('index.html', users=res)
 
 
 @bp.route('/people_status', methods=['GET'])
 @cross_origin()
 def people_status():
-	prop = {'url':'pstatus', 'class':'people'}
-	return render_template('people.html',  prop=prop)
+    prop = {'url': 'pstatus', 'class': 'people'}
+    return render_template('people.html', prop=prop)
 
 
 def format_requested_date(did: str) -> str:
-	a = did.split('-')
-	a.reverse()
-	return '.'.join(map(str, a))
+    a = did.split('-')
+    a.reverse()
+    return '.'.join(map(str, a))
+
 
 @bp.route('/pstatus/<did>', methods=['GET'])
 @cross_origin()
 def people_status_json(did):
-	max_ids = (select(func.max(PeopleStatus.id))
-		 .where(PeopleStatus.status_date <= did)
-		 .group_by(PeopleStatus.people_id)
-		 .cte()
-		 )
-	q = (select(People.id,
-				func.concat(People.last_name, ' ', People.first_name, ' ', People.second_name).label('fio'),
-				StatusName.name.label('status'), PeopleStatus.status_date)
-		 .select_from(People)
-		 .join(PeopleStatus, People.id == PeopleStatus.people_id)
-		 .join(StatusName, PeopleStatus.status_id == StatusName.id)
-		 .where(PeopleStatus.id.in_(select(max_ids)))
-		 .order_by(People.id)
-		 )
-	res = session.execute(q)
-	records = []
-	for row in res:
-		records.append(row._asdict())
+    max_ids = (select(func.max(PeopleStatus.id))
+               .where(PeopleStatus.status_date <= did)
+               .group_by(PeopleStatus.people_id)
+               .cte()
+               )
+    q = (select(People.id,
+                func.concat(People.last_name, ' ', People.first_name, ' ', People.second_name).label('fio'),
+                StatusName.name.label('status'), PeopleStatus.status_date)
+         .select_from(People)
+         .join(PeopleStatus, People.id == PeopleStatus.people_id)
+         .join(StatusName, PeopleStatus.status_id == StatusName.id)
+         .where(PeopleStatus.id.in_(select(max_ids)))
+         .order_by(People.id)
+         )
+    res = session.execute(q)
+    records = []
+    for row in res:
+        records.append(row._asdict())
 
-	title = f"Информация о людях на {format_requested_date(did)}"
+    title = f"Информация о людях на {format_requested_date(did)}"
 
-	header = {"id": 'ID', "fio": 'имя', "status": 'статус', "status_date": 'дата получения статуса'}
-	order = [i for i in header.keys()]
-	x = jsonify({'title': title, 'order':order,'header':header, 'data': records})
+    header = {"id": 'ID', "fio": 'имя', "status": 'статус', "status_date": 'дата получения статуса'}
+    order = [i for i in header.keys()]
+    x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
 
-	return x
+    return x
 
 
 @bp.route('/firms_status', methods=['GET'])
 @cross_origin()
 def firms_status():
-	prop = {'url':'pstatus', 'class':'firms'}
-	return render_template('people.html',  prop=prop)
+    prop = {'url': 'fstatus', 'class': 'firms'}
+    return render_template('people.html', prop=prop)
 
 
 @bp.route('/fstatus/<did>', methods=['GET'])
 @cross_origin()
 def firm_status_json(did):
-	maxrec = (select(func.max(FirmRating.id))
-		 .where(FirmRating.rate_date <= did)
-		 .group_by(FirmRating.firm_id)
-		 .cte()
-	)
-	actual_rating = select(FirmRating).where(FirmRating.id.in_(select(maxrec))).cte()
+    maxrec = (select(func.max(FirmRating.id))
+              .where(FirmRating.rate_date <= did)
+              .group_by(FirmRating.firm_id)
+              .cte()
+              )
+    actual_rating = select(FirmRating).where(FirmRating.id.in_(select(maxrec))).cte()
+    active_firms = (select(Firm.id, label('active', True))
+                    .where(or_(Firm.close_date.is_(None), Firm.close_date > did))
+                    .where(Firm.open_date <= did).cte())
 
-	q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
-				actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date)
-		 .select_from(Firm)
-		 .join(FirmName, Firm.firmname_id == FirmName.id)
-	     .join(actual_rating, actual_rating.c.firm_id == Firm.id, isouter=True)
-		 .where(or_(Firm.close_date.is_(None), Firm.close_date> did))
-		 .where(Firm.open_date <= did)
-	)
-	res = session.execute(q)
-	records = []
-	for row in res:
-		records.append(row._asdict())
+    '''
+    q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
+                actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date)
+         .select_from(Firm)
+         .join(FirmName, Firm.firmname_id == FirmName.id)
+         .join(actual_rating, actual_rating.c.firm_id == Firm.id, isouter=True)
+         .where(or_(Firm.close_date.is_(None), Firm.close_date > did))
+         .where(Firm.open_date <= did)
+         )
+    '''
+    q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
+				actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date, active_firms.c.active)
+		        .select_from(Firm)
+                .join(FirmName, Firm.firmname_id == FirmName.id)
+                .join(actual_rating, actual_rating.c.firm_id == Firm.id, isouter=True)
+                .join(active_firms, active_firms.c.id == Firm.id, isouter=True )
+		 )
 
-	title = f"Информация о фирмах на {format_requested_date(did)}"
-	header = {"id": 'ID', "name": 'название',  'open_date': 'дата открытия',  'close_date': 'дата закрытия',
-			  'workers_count': 'количество работников',  'rating': 'рейтинг',  'rate_date': 'дата рейтинга', }
-	order = [i for i in header.keys()]
-	print(order)
-	x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
-	print(x.json)
-	return x
+
+    res = session.execute(q)
+    records = []
+    for row in res:
+        records.append(row._asdict())
+
+    title = f"Информация о фирмах на {format_requested_date(did)}"
+    header = {"id": 'ID', "name": 'название', 'open_date': 'дата открытия', 'close_date': 'дата закрытия',
+              'workers_count': 'количество работников', 'rating': 'рейтинг', 'rate_date': 'дата рейтинга', }
+    order = [i for i in header.keys()]
+    print(order)
+    x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
+    print(x.json)
+    return x
