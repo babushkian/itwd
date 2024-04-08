@@ -23,6 +23,11 @@ def people_status():
 	return render_template('people.html', script='people')
 
 
+def format_requested_date(did: str) -> str:
+	a = did.split('-')
+	a.reverse()
+	return '.'.join(map(str, a))
+
 @bp.route('/pstatus/<did>', methods=['GET'])
 @cross_origin()
 def people_status_json(did):
@@ -44,11 +49,11 @@ def people_status_json(did):
 	records = []
 	for row in res:
 		records.append(row._asdict())
-	a = did.split('-')
-	a.reverse()
-	title = f"Информация о людях на {'.'.join(map(str, a))}"
-	order = ["id", "fio", "status", "status_date"]
+
+	title = f"Информация о людях на {format_requested_date(did)}"
+
 	header = {"id": 'ID', "fio": 'имя', "status": 'статус', "status_date": 'дата получения статуса'}
+	order = [i for i in header.keys()]
 	x = jsonify({'title': title, 'order':order,'header':header, 'data': records})
 
 	return x
@@ -58,6 +63,7 @@ def people_status_json(did):
 @cross_origin()
 def firms_status():
 	return render_template('people.html', script='firms')
+
 
 @bp.route('/fstatus/<did>', methods=['GET'])
 @cross_origin()
@@ -81,7 +87,12 @@ def firm_status_json(did):
 	records = []
 	for row in res:
 		records.append(row._asdict())
-	x = jsonify(records)
-	# print(x.json)
-	return x
 
+	title = f"Информация о фирмах на {format_requested_date(did)}"
+	header = {"id": 'ID', "name": 'название',  'open_date': 'дата открытия',  'close_date': 'дата закрытия',
+			  'workers_count': 'количество работников',  'rating': 'рейтинг',  'rate_date': 'дата рейтинга', }
+	order = [i for i in header.keys()]
+	print(order)
+	x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
+	print(x.json)
+	return x

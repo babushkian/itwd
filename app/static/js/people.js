@@ -5,8 +5,7 @@ async function getStat(date) {
   const data = await fetch(URL);
   const cd = await data.json();
   console.log(mainDate.value);
-  // buildTable(cd);
-  buildTableNew(cd);
+  buildTable(cd);
 }
 
 function convertInputToString(d) {
@@ -14,7 +13,7 @@ function convertInputToString(d) {
   return dp.reverse().join(".");
 }
 
-function buildTableNew({ title, order, header, data }) {
+function buildTable({ title, order, header, data }) {
   while (content.firstChild) {
     content.removeChild(content.firstChild);
   }

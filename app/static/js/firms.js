@@ -6,27 +6,34 @@ async function getStat(date) {
   buildTable(cd);
 }
 
-function buildTable(data) {
+function buildTable({ title, order, header, data }) {
   while (content.firstChild) {
     content.removeChild(content.firstChild);
   }
+  const tt = document.createElement("div");
+
+  tt.innerText = title;
+  tt.className = "table_title";
+  content.appendChild(tt);
   const tb = document.createElement("table");
   content.appendChild(tb);
+  const th = document.createElement("tr");
+  tb.appendChild(th);
+
+  order.forEach((el) => {
+    const thd = document.createElement("th");
+    thd.innerText = header[el];
+    th.appendChild(thd);
+  });
+
   data.forEach((element) => {
     const tr = document.createElement("tr");
     tb.appendChild(tr);
-    keys = [
-      "id",
-      "name",
-      "open_date",
-      "close_date",
-      "workers_count",
-      "rating",
-      "rate_date",
-    ];
-    keys.forEach((key) => {
+    order.forEach((key) => {
       let a = document.createElement("td");
-      if (["open_date", "close_date", "rate_date"].includes(key)) {
+      if (!key.includes("_date")) {
+        a.innerText = element[key];
+      } else {
         if (element[key]) {
           const d = new Date(element[key]);
           a.innerText =
@@ -38,8 +45,6 @@ function buildTable(data) {
         } else {
           a.innerText = "";
         }
-      } else {
-        a.innerText = element[key];
       }
 
       tr.appendChild(a);
