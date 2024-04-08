@@ -1,5 +1,6 @@
 // import { getStat } from "./table_data.js";
 const content = document.querySelector(".content__window.main");
+const sideWindow = document.querySelector(".content__window.side");
 
 const tableUrlEL = document.querySelector("#request");
 const tableUrl = tableUrlEL.dataset.url;
@@ -61,6 +62,9 @@ async function getStat(url_string, date) {
   const data = await fetch(URL);
   const cd = await data.json();
   buildMainTable(cd);
+  const firmId = cd.data[0]["id"];
+  const firmName = cd.data[0]["name"];
+  await getSideInfo(firmId, firmName, date);
 }
 
 function buildMainTable({ title, order, header, data }) {
@@ -85,8 +89,10 @@ function buildMainTable({ title, order, header, data }) {
   data.forEach((element) => {
     const tr = document.createElement("tr");
     tb.appendChild(tr);
-    if (!element.active) {
-      tr.classList.add("not_active");
+    if (element.hasOwnProperty("active")) {
+      if (!element.active) {
+        tr.classList.add("not_active");
+      }
     }
     order.forEach((key) => {
       let a = document.createElement("td");
@@ -112,6 +118,63 @@ function buildMainTable({ title, order, header, data }) {
 }
 
 function convertInputToString(d) {
-  dp = d.split("-");
+  const dp = d.split("-");
   return dp.reverse().join(".");
+}
+
+async function getSideInfo(firmId, firmName, date) {
+  const URL = `http://127.0.0.1:5000/rating_history?firm=${firmId}&date=${date}`;
+  const data = await fetch(URL);
+  const cd = await data.json();
+  buildSideTable(firmName, date, cd);
+}
+
+function buildSideTable(firmName, date, { order, header, data }) {
+  while (sideWindow.firstChild) {
+    sideWindow.removeChild(sideWindow.firstChild);
+  }
+  const tt = document.createElement("div");
+  tt.innerText = `История рейтинга фирмы "${firmName}" до ${convertInputToString(
+    date
+  )}`;
+  tt.className = "table_title";
+  sideWindow.appendChild(tt);
+  const tb = document.createElement("table");
+  sideWindow.appendChild(tb);
+  const th = document.createElement("tr");
+  tb.appendChild(th);
+
+  order.forEach((el) => {
+    const thd = document.createElement("th");
+    thd.innerText = header[el];
+    th.appendChild(thd);
+  });
+  data.forEach((element) => {
+    const tr = document.createElement("tr");
+    tb.appendChild(tr);
+    if (element.hasOwnProperty("active")) {
+      if (!element.active) {
+        tr.classList.add("not_active");
+      }
+    }
+    order.forEach((key) => {
+      let a = document.createElement("td");
+      if (!key.includes("_date")) {
+        a.innerText = element[key];
+      } else {
+        if (element[key]) {
+          const d = new Date(element[key]);
+          a.innerText =
+            d.getDate().toString().padStart(2, "0") +
+            "." +
+            (d.getMonth() + 1).toString().padStart(2, "0") +
+            "." +
+            d.getFullYear();
+        } else {
+          a.innerText = "";
+        }
+      }
+      tr.appendChild(a);
+    });
+  });
 }

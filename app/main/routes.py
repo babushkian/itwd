@@ -83,24 +83,14 @@ def firm_status_json(did):
                     .where(or_(Firm.close_date.is_(None), Firm.close_date > did))
                     .where(Firm.open_date <= did).cte())
 
-    '''
+
     q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
-                actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date)
-         .select_from(Firm)
-         .join(FirmName, Firm.firmname_id == FirmName.id)
-         .join(actual_rating, actual_rating.c.firm_id == Firm.id, isouter=True)
-         .where(or_(Firm.close_date.is_(None), Firm.close_date > did))
-         .where(Firm.open_date <= did)
-         )
-    '''
-    q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
-				actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date, active_firms.c.active)
-		        .select_from(Firm)
+                actual_rating.c.workers_count, actual_rating.c.rating, actual_rating.c.rate_date, active_firms.c.active)
+                .select_from(Firm)
                 .join(FirmName, Firm.firmname_id == FirmName.id)
                 .join(actual_rating, actual_rating.c.firm_id == Firm.id, isouter=True)
                 .join(active_firms, active_firms.c.id == Firm.id, isouter=True )
-		 )
-
+                )
 
     res = session.execute(q)
     records = []
@@ -115,3 +105,21 @@ def firm_status_json(did):
     x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
     print(x.json)
     return x
+
+
+@bp.get('/rating_history')
+@cross_origin()
+def rating_history_json():
+    cur_date = request.args.get('date')
+    firm_id = request.args.get('firm')
+    q = (select(FirmRating.workers_count, FirmRating.rating, FirmRating.rate_date)
+         .where(FirmRating.firm_id == firm_id)
+         .where(FirmRating.rate_date <= cur_date))
+    res = session.execute(q)
+    records = []
+    for row in res:
+        records.append(row._asdict())
+
+    header = {'workers_count': 'количество работников', 'rating': 'рейтинг', 'rate_date': 'дата рейтинга', }
+    order = [i for i in header.keys()]
+    return {'order': order, 'header': header, 'data':records}

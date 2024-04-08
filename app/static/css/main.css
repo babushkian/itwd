@@ -167,7 +167,7 @@ table tr:hover {
   background-color: rgb(227, 241, 232);
 }
 table tr.not_active {
-  color: #888;
+  color: #777;
 }
 table tr span:hover {
   text-decoration: underline;
