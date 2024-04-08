@@ -71,7 +71,9 @@
     </div>
     
     {% block js %}
-      <script src="{{ url_for('static', filename = 'js/header.js') }}"></script>
+
+      <script type="module"  src="{{ url_for('static', filename = 'js/header.js') }}"></script>
+
     {% endblock js %}
   </body>
 </html>

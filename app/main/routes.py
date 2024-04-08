@@ -20,7 +20,8 @@ def index():
 @bp.route('/people_status', methods=['GET'])
 @cross_origin()
 def people_status():
-	return render_template('people.html', script='people')
+	prop = {'url':'pstatus', 'class':'people'}
+	return render_template('people.html',  prop=prop)
 
 
 def format_requested_date(did: str) -> str:
@@ -62,7 +63,8 @@ def people_status_json(did):
 @bp.route('/firms_status', methods=['GET'])
 @cross_origin()
 def firms_status():
-	return render_template('people.html', script='firms')
+	prop = {'url':'pstatus', 'class':'firms'}
+	return render_template('people.html',  prop=prop)
 
 
 @bp.route('/fstatus/<did>', methods=['GET'])
