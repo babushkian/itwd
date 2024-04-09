@@ -23,10 +23,10 @@
         <input
           type="date"
           id="main-date"
-          value="2007-01-01"
+          value="{{time_limits.current_date}}"
           required
-          min="2005-01-01"
-          max="2014-01-01"
+          min="{{ time_limits.start_date }}"
+          max="{{ time_limits.end_date }}"
         />
 
         <button id="day-plus">></button>

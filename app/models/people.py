@@ -1,5 +1,5 @@
-﻿from sqlalchemy import Column, String, Integer, Date, ForeignKey, Index
-from app.models import Base
+﻿from sqlalchemy import select, Column, String, Integer, Date, ForeignKey, Index
+from app.models import Base, session
 
 
 
@@ -48,4 +48,11 @@ class PeopleStatus(Base):
     status_id = Column(Integer, ForeignKey('statuses.id'))
     status_date = Column(Date, index=True)
     __table_args__ = (Index('ix_people_status_people_id_status_id', people_id, status_id),)
+
+    @staticmethod
+    def get_start_date():
+        q = select(PeopleStatus)
+        r = session.execute(q).scalars().first()
+        print(r)
+        return r.status_date
 

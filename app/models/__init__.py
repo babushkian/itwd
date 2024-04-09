@@ -4,7 +4,7 @@ from app.cred import Cred
 class Base(DeclarativeBase):
     pass
 
-engine = create_engine(f'mysql+mysqlconnector://{Cred.user}:{Cred.passw}@{Cred.host}/{Cred.base}', echo=True)
+engine = create_engine(f'mysql+mysqlconnector://{Cred.user}:{Cred.passw}@{Cred.host}/{Cred.base}', echo=False)
 Session = sessionmaker()
 Session.configure(bind=engine)
 session = Session()

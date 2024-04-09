@@ -1,4 +1,5 @@
-﻿from flask import render_template, flash, redirect, url_for, request, g, jsonify, current_app
+﻿import flask
+from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from sqlalchemy import select, func, or_
 from sqlalchemy.sql.expression import True_, label
 
@@ -8,7 +9,7 @@ from app.main import bp
 from app.models import session
 from app.models.people import People, PeopleStatus, StatusName
 from app.models.firms import Firm, FirmName, FirmRating
-
+from app.models.last_sim_date import LastSimDate
 
 @bp.route('/', methods=['GET'])
 def index():
@@ -19,11 +20,27 @@ def index():
     return render_template('index.html', users=res)
 
 
+def get_time_limits():
+    sd = flask.session.get('start_date')
+    if sd is None:
+        sd = PeopleStatus.get_start_date().strftime('%Y-%m-%d')
+        flask.session['start_date'] = sd
+    fd = flask.session.get('end_date')
+    if fd is None:
+        fd = LastSimDate.get_end_date().strftime('%Y-%m-%d')
+        flask.session['end_date'] = fd
+    flask.session.get('current_date')
+    if not flask.session.get('current_date'):
+        flask.session['current_date'] = sd
+    return {'start_date': sd, 'end_date': fd, 'current_date': flask.session['current_date']}
+
+
 @bp.route('/people_status', methods=['GET'])
 @cross_origin()
 def people_status():
+    tl = get_time_limits()
     prop = {'url': 'pstatus', 'class': 'people'}
-    return render_template('people.html', prop=prop)
+    return render_template('people.html', prop=prop, time_limits = tl)
 
 
 def format_requested_date(did: str) -> str:
@@ -35,6 +52,7 @@ def format_requested_date(did: str) -> str:
 @bp.route('/pstatus/<did>', methods=['GET'])
 @cross_origin()
 def people_status_json(did):
+    flask.session['current_date'] = did
     max_ids = (select(func.max(PeopleStatus.id))
                .where(PeopleStatus.status_date <= did)
                .group_by(PeopleStatus.people_id)
@@ -55,24 +73,23 @@ def people_status_json(did):
         records.append(row._asdict())
 
     title = f"Информация о людях на {format_requested_date(did)}"
-
     header = {"id": 'ID', "fio": 'имя', "status": 'статус', "status_date": 'дата получения статуса'}
     order = [i for i in header.keys()]
-    x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
-
-    return x
+    return {'title': title, 'order': order, 'header': header, 'data': records}
 
 
 @bp.route('/firms_status', methods=['GET'])
 @cross_origin()
 def firms_status():
+    tl = get_time_limits()
     prop = {'url': 'fstatus', 'class': 'firms'}
-    return render_template('people.html', prop=prop)
+    return render_template('people.html', prop=prop, time_limits = tl)
 
 
 @bp.route('/fstatus/<did>', methods=['GET'])
 @cross_origin()
 def firm_status_json(did):
+    flask.session['current_date'] = did
     maxrec = (select(func.max(FirmRating.id))
               .where(FirmRating.rate_date <= did)
               .group_by(FirmRating.firm_id)
@@ -101,10 +118,7 @@ def firm_status_json(did):
     header = {"id": 'ID', "name": 'название', 'open_date': 'дата открытия', 'close_date': 'дата закрытия',
               'workers_count': 'количество работников', 'rating': 'рейтинг', 'rate_date': 'дата рейтинга', }
     order = [i for i in header.keys()]
-    print(order)
-    x = jsonify({'title': title, 'order': order, 'header': header, 'data': records})
-    print(x.json)
-    return x
+    return {'title': title, 'order': order, 'header': header, 'data': records}
 
 
 @bp.get('/rating_history')
@@ -120,6 +134,6 @@ def rating_history_json():
     for row in res:
         records.append(row._asdict())
 
-    header = {'workers_count': 'количество работников', 'rating': 'рейтинг', 'rate_date': 'дата рейтинга', }
+    header = {'rate_date': 'дата рейтинга', 'rating': 'рейтинг', 'workers_count': 'количество работников'}
     order = [i for i in header.keys()]
     return {'order': order, 'header': header, 'data':records}
