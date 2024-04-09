@@ -4,6 +4,7 @@ const sideWindow = document.querySelector(".content__window.side");
 
 const tableUrlEL = document.querySelector("#request");
 const tableUrl = tableUrlEL.dataset.url;
+console.log("селестор страницы", tableUrl);
 
 const active = document.querySelector(".option_" + tableUrlEL.dataset.class);
 active.classList.add("option_active");
@@ -61,7 +62,7 @@ dayFofward.addEventListener("click", () => {
   let date = new Date(mainDate.value);
   date.setDate(date.getDate() + 1);
   mainDate.valueAsDate = date;
-  getStat(tableUrl, this.value);
+  getStat(tableUrl, mainDate.value);
 });
 
 monthFofward.addEventListener("click", () => {
@@ -69,14 +70,14 @@ monthFofward.addEventListener("click", () => {
   const a = new Date(date.getFullYear(), date.getMonth() + 1, 0);
   date.setDate(date.getDate() + a.getDate());
   mainDate.valueAsDate = date;
-  getStat(tableUrl, this.value);
+  getStat(tableUrl, mainDate.value);
 });
 
 dayBackward.addEventListener("click", () => {
   let date = new Date(mainDate.value);
   date.setDate(date.getDate() - 1);
   mainDate.valueAsDate = date;
-  getStat(tableUrl, this.value);
+  getStat(tableUrl, mainDate.value);
 });
 
 monthBackward.addEventListener("click", () => {
@@ -84,16 +85,16 @@ monthBackward.addEventListener("click", () => {
   const a = new Date(date.getFullYear(), date.getMonth(), 0);
   date.setDate(date.getDate() - a.getDate());
   mainDate.valueAsDate = date;
-  getStat(tableUrl, this.value);
+  getStat(tableUrl, mainDate.value);
 });
 
 startDateButton.addEventListener("click", () => {
   mainDate.value = startDate;
-  getStat(tableUrl, this.value);
+  getStat(tableUrl, mainDate.value);
 });
 endDateButton.addEventListener("click", () => {
   mainDate.value = endDate;
-  getStat(tableUrl, this.value);
+  getStat(tableUrl, mainDate.value);
 });
 
 getStat(tableUrl, mainDate.value);
