@@ -18,8 +18,10 @@
         </div>
       </div>
       <div class="header_row timer">
-        <button id="month-minus"><<</button>
-        <button id="day-minus"><</button>
+        <button id="start_date" class="left">нач</button>
+        <button id="month-minus" class="left"><мес</button>
+        <button id="day-minus" class="left"><ден</button>
+
         <input
           type="date"
           id="main-date"
@@ -29,8 +31,9 @@
           max="{{ time_limits.end_date }}"
         />
 
-        <button id="day-plus">></button>
-        <button id="month-plus">>></button>
+        <button id="day-plus" class="right">ден></button>
+        <button id="month-plus" class="right">мес></button>
+        <button id="end_date" class="right">кон</button>
       </div>
     </div>
     <div class="content">

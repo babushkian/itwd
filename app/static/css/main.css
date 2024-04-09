@@ -92,15 +92,21 @@ body {
 }
 .timer button {
   font-family: "FiraSans", Arial, Helvetica, sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   background-color: #e0e0f8;
-  border-radius: 2px;
+  border-radius: 1px;
   margin: 0 0.2rem;
+  padding: 0 0.35rem;
+  height: 25px;
   min-width: 2rem;
   border: 0;
 }
+.timer button:hover:enabled {
+  opacity: 0.9;
+}
 .timer input {
   font-family: "FiraSans", Arial, Helvetica, sans-serif;
+  height: 25px;
   width: 140px;
   font-size: 1.25rem;
   background-color: #e0e0f8;
@@ -167,7 +173,7 @@ table tr:hover {
   background-color: rgb(227, 241, 232);
 }
 table tr.not_active {
-  color: #777;
+  color: #999;
 }
 table tr span:hover {
   text-decoration: underline;
@@ -176,4 +182,4 @@ table td {
   padding: 8px 15px;
   text-align: center;
   min-width: 100px;
-} /*# sourceMappingURL=main.css.map */
+}/*# sourceMappingURL=main.css.map */
