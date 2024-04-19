@@ -37,17 +37,13 @@
       </div>
     </div>
     <div class="content">
-      <div class="content__window main">
       {% block content %}
       {% endblock content %}
-      </div>
-            <div class="content__window side">
-      </div>
     </div>
     
     {% block js %}
 
-      <script type="module"  src="{{ url_for('static', filename = 'js/header.js') }}"></script>
+      <script type="module"  src="{{ url_for('static', filename = 'js/main.js') }}"></script>
 
     {% endblock js %}
   </body>

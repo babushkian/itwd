@@ -13,11 +13,7 @@ from app.models.last_sim_date import LastSimDate
 
 @bp.route('/', methods=['GET'])
 def index():
-    q = select(People).limit(20)
-    res = session.execute(q).scalars().all()
-    for i in res:
-        print(i)
-    return render_template('index.html', users=res)
+    return redirect(url_for('main.firms_status'))
 
 
 def get_time_limits():
