@@ -17,6 +17,8 @@ def index():
 
 
 def get_time_limits():
+    # flask.session['start_date'] = None
+    # flask.session['end_date'] = None
     sd = flask.session.get('start_date')
     if sd is None:
         sd = PeopleStatus.get_start_date().strftime('%Y-%m-%d')
