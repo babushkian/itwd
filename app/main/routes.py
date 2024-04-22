@@ -7,7 +7,7 @@ from flask_cors import cross_origin
 
 from app.main import bp
 from app.models import session
-from app.models.people import People, PeopleStatus, StatusName
+from app.models.people import People, PeopleFirm, PeoplePosition, PeopleStatus, StatusName, PositionNames
 from app.models.firms import Firm, FirmName, FirmRating
 from app.models.last_sim_date import LastSimDate
 
@@ -135,3 +135,49 @@ def rating_history_json():
     header = {'rate_date': 'дата рейтинга', 'rating': 'рейтинг', 'workers_count': 'количество работников'}
     order = [i for i in header.keys()]
     return {'order': order, 'header': header, 'data':records}
+
+@bp.get('/current_staff')
+@cross_origin()
+def current_staff():
+    cur_date = request.args.get('date')
+    firm_id = request.args.get('firm')
+    firm_last_event = (select(func.max(PeopleFirm.id))
+                       .where(PeopleFirm.move_to_firm_date <= cur_date)
+                       .group_by(PeopleFirm.people_id)
+                       .cte()
+                       )
+    assignments = (select(PeopleFirm)
+                   .where(PeopleFirm.id.in_(select(firm_last_event)))
+                   .where(PeopleFirm.firm_to_id == firm_id)
+                   .cte()
+                   )
+
+    pep_pos_ids = (select(func.max(PeoplePosition.id))
+                   .where(PeoplePosition.people_id.in_(select(assignments.c.people_id)))
+                   .where(PeoplePosition.move_to_position_date < cur_date)
+                   .group_by(PeoplePosition.people_id)
+                   .cte()
+                   )
+    pep_pos = (select(PeoplePosition)
+               .where(PeoplePosition.id.in_(select(pep_pos_ids)))
+               .cte()
+               )
+
+    q = (select(People.id, func.concat(People.last_name, ' ', People.first_name, ' ', People.second_name).label('fio'),
+                People.talent, PositionNames.name.label('position'), pep_pos.c.move_to_position_date.label('position_date'),
+                assignments.c.move_to_firm_date.label('assign_date'))
+                .select_from(People)
+                .join(pep_pos, pep_pos.c.people_id == People.id)
+                .join(PositionNames, pep_pos.c.position_id ==PositionNames.id)
+                .join(assignments, pep_pos.c.people_id == assignments.c.people_id)
+                .order_by(pep_pos.c.position_id.desc(), assignments.c.move_to_firm_date)
+         )
+    res = session.execute(q)
+    records = []
+    for row in res:
+        records.append(row._asdict())
+    header = {'id': 'ID', 'fio': 'ФИО',  'talent': 'талант',  'position': 'должность',
+              'position_date': 'в должности с ',  'assign_date': 'работает с'}
+    order = [i for i in header.keys()]
+    return {'order': order, 'header': header, 'data':records}
+

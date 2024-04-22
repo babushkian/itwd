@@ -56,3 +56,38 @@ class PeopleStatus(Base):
         print(r)
         return r.status_date
 
+class PeopleFirm(Base):
+    """Таблица показывает, в каких фирмах работали люди. Из какой фирмы пришли и в какой день
+    устроились на новое место"""
+    __tablename__ = 'people_firms'
+    id = Column(Integer, primary_key=True)
+    people_id = Column(Integer, ForeignKey('people.id'))
+    firm_from_id = Column(Integer)
+    firm_to_id = Column(Integer, ForeignKey('firms.id'))
+    move_to_firm_date = Column(Date, index=True)
+    __table_args__ = (Index('ix_people_firms_people_id_firm_id', people_id, firm_to_id),)
+
+    def __repr__(self):
+        return f"<PeopleFirm people_id= {self.people_id} from_firm= {self.firm_from_id} to_firm={self.firm_to_id} date {self.move_to_firm_date}>"
+
+class PeoplePosition(Base):
+    """
+    Промежуточная таблица, связывающая людей и их должности
+    """
+
+    __tablename__ = 'people_positions'
+    id = Column(Integer, primary_key=True)
+    people_id = Column(Integer, ForeignKey('people.id'))
+    position_id = Column(Integer, ForeignKey('positions.id'))
+    move_to_position_date = Column(Date, index=True)
+    __table_args__ = (Index('ix_people_positions_people_id_pos_id', people_id, position_id),)
+
+    def __repr__(self):
+        return f"<PepPos {self.people_id=} {self.position_id=} date {self.move_to_position_date}>"
+
+class PositionNames(Base):
+    """Словарь названий позиций"""
+    __tablename__ = 'positions'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(70))
+
