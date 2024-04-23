@@ -47,12 +47,13 @@ def format_requested_date(did: str) -> str:
     return '.'.join(map(str, a))
 
 
-@bp.route('/pstatus/<did>', methods=['GET'])
+@bp.route('/pstatus/', methods=['GET'])
 @cross_origin()
-def people_status_json(did):
-    flask.session['current_date'] = did
+def people_status_json():
+    cur_date = request.args.get('date')
+    flask.session['current_date'] = cur_date
     max_ids = (select(func.max(PeopleStatus.id))
-               .where(PeopleStatus.status_date <= did)
+               .where(PeopleStatus.status_date <= cur_date)
                .group_by(PeopleStatus.people_id)
                .cte()
                )
@@ -70,7 +71,7 @@ def people_status_json(did):
     for row in res:
         records.append(row._asdict())
 
-    title = f"Информация о людях на {format_requested_date(did)}"
+    title = f"Информация о людях на {format_requested_date(cur_date)}"
     header = {"id": 'ID', "fio": 'имя', "status": 'статус', "status_date": 'дата получения статуса'}
     order = [i for i in header.keys()]
     return {'title': title, 'order': order, 'header': header, 'data': records}
@@ -84,19 +85,20 @@ def firms_status():
     return render_template('people.html', prop=prop, time_limits = tl)
 
 
-@bp.route('/fstatus/<did>', methods=['GET'])
+@bp.route('/fstatus', methods=['GET'])
 @cross_origin()
-def firm_status_json(did):
-    flask.session['current_date'] = did
+def firm_status_json():
+    cur_date = request.args.get('date')
+    flask.session['current_date'] = cur_date
     maxrec = (select(func.max(FirmRating.id))
-              .where(FirmRating.rate_date <= did)
+              .where(FirmRating.rate_date <= cur_date)
               .group_by(FirmRating.firm_id)
               .cte()
               )
     actual_rating = select(FirmRating).where(FirmRating.id.in_(select(maxrec))).cte()
     active_firms = (select(Firm.id, label('active', True))
-                    .where(or_(Firm.close_date.is_(None), Firm.close_date > did))
-                    .where(Firm.open_date <= did).cte())
+                    .where(or_(Firm.close_date.is_(None), Firm.close_date > cur_date))
+                    .where(Firm.open_date <= cur_date).cte())
 
 
     q = (select(Firm.id, FirmName.name, Firm.open_date, Firm.close_date,
@@ -112,7 +114,7 @@ def firm_status_json(did):
     for row in res:
         records.append(row._asdict())
 
-    title = f"Информация о фирмах на {format_requested_date(did)}"
+    title = f"Информация о фирмах на {format_requested_date(cur_date)}"
     header = {"id": 'ID', "name": 'название', 'open_date': 'дата открытия', 'close_date': 'дата закрытия',
               'workers_count': 'количество работников', 'rating': 'рейтинг', 'rate_date': 'дата рейтинга', }
     order = [i for i in header.keys()]

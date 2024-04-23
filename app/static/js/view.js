@@ -17,7 +17,7 @@ export class View {
   }
 
   async getStat(date) {
-    const URL = `http://127.0.0.1:5000/${this.mainTabUrl}/${date}`;
+    const URL = `http://127.0.0.1:5000/${this.mainTabUrl}?date=${date}`;
     console.log(URL);
     const data = await fetch(URL);
     this.mainPanel.jsonContent = await data.json();
